@@ -1,6 +1,8 @@
 """Database models for the playthrough app."""
 from django.db import models
 
+from genki.validators import hex_validator
+
 
 class Guild(models.Model):
     """A model to represent a Discord guild."""
@@ -39,6 +41,25 @@ class Series(models.Model):
         return self.name
 
 
+class RoleTemplate(models.Model):
+    """A model to represent a completion 'role' for a certain game."""
+    #: The name of the role.
+    name = models.CharField(
+        max_length=100, db_index=True, help_text='The role\'s name in English.'
+    )
+    colour = models.CharField(
+        max_length=6, help_text='The role\'s colour in hex.', validators=[hex_validator]
+    )
+
+    def __str__(self) -> str:
+        """
+        Return a string representing the object.
+
+        :return: The name of the role.
+        """
+        return self.name
+
+
 class Game(models.Model):
     """A model to represent a game."""
     #: The name of the game.
@@ -52,6 +73,10 @@ class Game(models.Model):
     prequels = models.ManyToManyField(
         'self', related_name='sequels', blank=True, symmetrical=False
     )
+    #: The game's completion role.
+    completion_role = models.OneToOneField(
+        RoleTemplate, on_delete=models.SET_NULL, null=True, related_name='game'
+    )
 
     def __str__(self) -> str:
         """
@@ -60,3 +85,9 @@ class Game(models.Model):
         :return: The name of the game.
         """
         return self.name
+
+
+__all__ = [
+    'Guild', 'Series',
+    'Game', 'RoleTemplate'
+]
