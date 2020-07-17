@@ -2,10 +2,24 @@ import pytest
 from django.core.exceptions import ValidationError
 
 from playthrough.models import (
-    Guild, Series, RoleTemplate, Game, User, Channel
+    Guild, Series, RoleTemplate, Game, User, Channel, Category,
+    GameConfig
 )
 
 from . import PlaythroughTestBase
+
+
+class TestUser(PlaythroughTestBase):
+    @staticmethod
+    def create_user(_id: str = '93043948775305216') -> User:
+        return User.objects.create(id=_id)
+
+    def test_create(self):
+        user_id = '1234567891234567'
+        user = self.create_user(user_id)
+        assert user.id == user_id
+        assert user.pk == user_id
+        assert str(user) == user_id
 
 
 class TestGuild(PlaythroughTestBase):
@@ -19,6 +33,22 @@ class TestGuild(PlaythroughTestBase):
         assert guild.id == guild_id
         assert guild.pk == guild_id
         assert str(guild) == guild_id
+
+    def test_admins(self):
+        user = TestUser.create_user()
+        guild = self.create_guild()
+        guild.admins.add(user)
+        assert len(guild.admins.all()) > 0
+        assert guild.admins.all()[0].id == user.id
+
+    def test_games(self):
+        guild = self.create_guild()
+        game = GameConfig.objects.create(
+            game=Game.objects.create(name='Test Game'),
+            guild=guild, completion_role_id='406495229743595520'
+        )
+        guild.games.add(game)
+        assert len(guild.games.all()) > 0
 
 
 class TestSeries(PlaythroughTestBase):
@@ -97,17 +127,39 @@ class TestGame(PlaythroughTestBase):
         assert len(game2.sequels.all()) > 0
 
 
-class TestUser(PlaythroughTestBase):
+class TestCategory(PlaythroughTestBase):
     @staticmethod
-    def create_user(_id: str = '93043948775305216') -> User:
-        return User.objects.create(id=_id)
+    def create_category(_id: str = '599079485639229440') -> Category:
+        guild = TestGuild.create_guild()
+        return Category.objects.create(id=_id, guild=guild)
 
     def test_create(self):
-        user_id = '1234567891234567'
-        user = self.create_user(user_id)
-        assert user.id == user_id
-        assert user.pk == user_id
-        assert str(user) == user_id
+        category_id = '373025048740626433'
+        category = self.create_category(category_id)
+        assert category.id == category_id
+        assert category.pk == category_id
+        assert category.guild is not None
+        assert str(category) == category_id
+
+
+class TestGameConfig(PlaythroughTestBase):
+    @staticmethod
+    def create_game_config(role_id: str = '406495229743595520') -> GameConfig:
+        game = TestGame.create_game()
+        category = TestCategory.create_category()
+        return GameConfig.objects.create(
+            guild=category.guild, game=game, category=category,
+            completion_role_id=role_id
+        )
+
+    def test_create(self):
+        role_id = '421657085000810507'
+        game_config = self.create_game_config(role_id)
+        assert game_config.category is not None
+        assert game_config.guild is not None
+        assert game_config.game is not None
+        assert game_config.completion_role_id == role_id
+        assert str(game_config) == f'{game_config.guild} - {game_config.game}'
 
 
 class TestChannel(PlaythroughTestBase):
