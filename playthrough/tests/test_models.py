@@ -3,16 +3,17 @@ from django.core.exceptions import ValidationError
 
 from playthrough.models import (
     Guild, Series, RoleTemplate, Game, User, Channel, Category,
-    GameConfig
+    GameConfig, MetaRoleTemplate, Archive
 )
 
 from . import PlaythroughTestBase
+from .utils import get_xml_file
 
 
 class TestUser(PlaythroughTestBase):
     @staticmethod
     def create_user(_id: str = '93043948775305216') -> User:
-        return User.objects.create(id=_id)
+        return User.objects.get_or_create(id=_id)[0]
 
     def test_create(self):
         user_id = '1234567891234567'
@@ -54,7 +55,7 @@ class TestGuild(PlaythroughTestBase):
 class TestSeries(PlaythroughTestBase):
     @staticmethod
     def create_series(name: str = 'Science Adventure') -> Series:
-        return Series.objects.create(name=name)
+        return Series.objects.get_or_create(name=name)[0]
 
     def test_create(self):
         series_name = 'Nasuverse'
@@ -168,7 +169,7 @@ class TestChannel(PlaythroughTestBase):
         game = TestGame.create_game()
         user = TestUser.create_user()
         guild = TestGuild.create_guild()
-        return Channel.objects.create(id=_id, owner=user, game=game, guild=guild)
+        return Channel.objects.get_or_create(id=_id, owner=user, game=game, guild=guild)[0]
 
     def test_create(self):
         channel_id = '499672300291883008'
@@ -179,3 +180,36 @@ class TestChannel(PlaythroughTestBase):
         assert channel.owner is not None
         assert channel.game is not None
         assert str(channel) == channel_id
+
+
+class TestMetaRoleTemplate(PlaythroughTestBase):
+    @staticmethod
+    def create_metaroletemplate(
+        name: str = 'Child Head', expr: str = 'test1&&test2'
+    ) -> MetaRoleTemplate:
+        return MetaRoleTemplate.objects.create(name=name, expression=expr)
+
+    def test_create(self):
+        role = self.create_metaroletemplate()
+        game1 = TestGame.create_game(name='Game 1')
+        game2 = TestGame.create_game(name='Game 2')
+        role.games.add(game1, game2)
+        assert len(role.games.all()) == 2
+        assert role.expression is not None
+
+
+class TestArchive(PlaythroughTestBase):
+    @staticmethod
+    def create_archive():
+        channel = TestChannel.create_channel()
+        file = get_xml_file()
+        return Archive.objects.create(channel=channel, file=file)
+
+    def test_create(self):
+        archive = self.create_archive()
+        assert archive.file is not None
+        channel = Channel.objects.get(pk=archive.channel.id)
+        assert channel.archive is not None
+        user = TestUser.create_user()
+        archive.users.add(user)
+        assert len(archive.users.all()) > 0

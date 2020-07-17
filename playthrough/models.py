@@ -70,7 +70,9 @@ class RoleTemplate(models.Model):
     name = models.CharField(
         max_length=100, db_index=True, help_text=_('The Role\'s name.')
     )
-    colour = HexColourField(help_text=_('The Role\'s colour in hex.'))
+    colour = HexColourField(
+        null=True, blank=True, help_text=_('The Role\'s colour in hex.')
+    )
 
     def __str__(self) -> str:
         """
@@ -198,9 +200,53 @@ class Channel(models.Model):
         return self.id
 
 
+class MetaRoleTemplate(RoleTemplate):
+    """A model to represent meta role templates."""
+    #: The meta role's expression.
+    expression = models.CharField(
+        max_length=255, help_text=_('The meta role\'s expression.')
+    )
+    #: The games the meta role is associated with.
+    games = models.ManyToManyField(
+        Game, related_name='meta_roles',
+        help_text=_('The Games the MetaRole is associated with.')
+    )
+
+
+class Archive(models.Model):
+    """A model to represent an archive."""
+    def _get_archive_path(instance, filename: str) -> str:
+        """Utility function to get the path for an archive file.
+
+        :return: The path for an archive file based on the Archive instance."""
+        return f'{instance.channel.id}/{filename}'
+
+    #: The Channel the archive is for.
+    channel = models.OneToOneField(
+        Channel, related_name='archive', on_delete=models.CASCADE,
+        help_text=_('The Channel the archive is for.')
+    )
+    #: The Users that appear within the archive.
+    users = models.ManyToManyField(
+        User, related_name='archives',
+        help_text=_('The Users that appear within the archive.')
+    )
+    #: The archive file.
+    file = models.FileField(upload_to=_get_archive_path)
+
+    def __str__(self) -> str:
+        """
+        Return a string representing the object.
+
+        :return: The id of the user.
+        """
+        return _('Archive for %s' % self.channel)
+
+
 __all__ = [
     'Guild', 'Series',
     'Game', 'RoleTemplate',
     'User', 'Channel',
-    'Category', 'GameConfig'
+    'Category', 'GameConfig',
+    'MetaRoleTemplate', 'Archive'
 ]
