@@ -15,6 +15,20 @@ def hex_validator(colour: str):
     ).__call__(colour)
 
 
+def discord_id_validator(_id: str):
+    """
+    Call :class:`~django.core.validators.RegexValidator`
+    to validate a discord ID.
+    :param name: The ID to be validated.
+    :raises ValidationError: If the ID is invalid.
+    """
+    RegexValidator(
+        regex=r'^\d{17,}$',
+        message='Invalid Discord ID.',
+        code='invalid_id_colour'
+    ).__call__(_id)
+
+
 __all__ = [
-    'hex_validator',
+    'hex_validator', 'discord_id_validator'
 ]

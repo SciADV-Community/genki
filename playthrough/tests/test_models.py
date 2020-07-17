@@ -1,7 +1,9 @@
 import pytest
 from django.core.exceptions import ValidationError
 
-from playthrough.models import Guild, Series, Game, RoleTemplate
+from playthrough.models import (
+    Guild, Series, RoleTemplate, Game, User, Channel
+)
 
 from . import PlaythroughTestBase
 
@@ -93,3 +95,35 @@ class TestGame(PlaythroughTestBase):
         game2.refresh_from_db()
         assert len(game.prequels.all()) > 0
         assert len(game2.sequels.all()) > 0
+
+
+class TestUser(PlaythroughTestBase):
+    @staticmethod
+    def create_user(_id: str = '93043948775305216') -> User:
+        return User.objects.create(id=_id)
+
+    def test_create(self):
+        user_id = '1234567891234567'
+        user = self.create_user(user_id)
+        assert user.id == user_id
+        assert user.pk == user_id
+        assert str(user) == user_id
+
+
+class TestChannel(PlaythroughTestBase):
+    @staticmethod
+    def create_channel(_id: str = '499636879554117642') -> Channel:
+        game = TestGame.create_game()
+        user = TestUser.create_user()
+        guild = TestGuild.create_guild()
+        return Channel.objects.create(id=_id, owner=user, game=game, guild=guild)
+
+    def test_create(self):
+        channel_id = '499672300291883008'
+        channel = self.create_channel(channel_id)
+        assert channel.id == channel_id
+        assert channel.pk == channel_id
+        assert channel.guild is not None
+        assert channel.owner is not None
+        assert channel.game is not None
+        assert str(channel) == channel_id

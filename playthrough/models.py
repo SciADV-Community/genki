@@ -1,15 +1,16 @@
 """Database models for the playthrough app."""
 from django.db import models
 
-from genki.validators import hex_validator
+from genki.models import DiscordIDField, HexColourField
+from django.utils.translation import gettext_lazy as _
 
 
 class Guild(models.Model):
     """A model to represent a Discord guild."""
     #: The Discord ID of the Guild.
-    id = models.CharField(
-        max_length=255, db_index=True, unique=True, primary_key=True,
-        help_text='The Guild\'s Discord ID.'
+    id = DiscordIDField(
+        db_index=True, unique=True, primary_key=True,
+        help_text=_('The Guild\'s Discord ID.')
     )
 
     def __str__(self) -> str:
@@ -26,7 +27,7 @@ class Series(models.Model):
     #: The name of the series.
     name = models.CharField(
         max_length=255, db_index=True, unique=True, primary_key=True,
-        help_text='The Series\' name in English.'
+        help_text=_('The Series\' name.')
     )
 
     class Meta:
@@ -45,11 +46,9 @@ class RoleTemplate(models.Model):
     """A model to represent a completion 'role' for a certain game."""
     #: The name of the role.
     name = models.CharField(
-        max_length=100, db_index=True, help_text='The role\'s name in English.'
+        max_length=100, db_index=True, help_text=_('The Role\'s name.')
     )
-    colour = models.CharField(
-        max_length=6, help_text='The role\'s colour in hex.', validators=[hex_validator]
-    )
+    colour = HexColourField(help_text=_('The Role\'s colour in hex.'))
 
     def __str__(self) -> str:
         """
@@ -65,17 +64,22 @@ class Game(models.Model):
     #: The name of the game.
     name = models.CharField(
         max_length=255, db_index=True, unique=True, primary_key=True,
-        help_text='The Game\'s name in English.'
+        help_text=_('The Game\'s name.')
     )
     #: The game's series.
-    series = models.ForeignKey(Series, on_delete=models.CASCADE, related_name='games')
+    series = models.ForeignKey(
+        Series, on_delete=models.CASCADE, related_name='games',
+        help_text=_('The Series the Game belongs to.')
+    )
     #: The game's prequels.
     prequels = models.ManyToManyField(
-        'self', related_name='sequels', blank=True, symmetrical=False
+        'self', related_name='sequels', blank=True, symmetrical=False,
+        help_text=_('The game\'s prequels.')
     )
     #: The game's completion role.
     completion_role = models.OneToOneField(
-        RoleTemplate, on_delete=models.SET_NULL, null=True, related_name='game'
+        RoleTemplate, on_delete=models.SET_NULL, null=True, related_name='game',
+        help_text=_('The role to grant upon game completion.')
     )
 
     def __str__(self) -> str:
@@ -87,7 +91,57 @@ class Game(models.Model):
         return self.name
 
 
+class User(models.Model):
+    """A model to represent a Discord user."""
+    #: The Discord ID of the user.
+    id = DiscordIDField(
+        db_index=True, unique=True, primary_key=True,
+        help_text=_('The User\'s Discord ID.')
+    )
+
+    def __str__(self) -> str:
+        """
+        Return a string representing the object.
+
+        :return: The id of the user.
+        """
+        return self.id
+
+
+class Channel(models.Model):
+    """A model to represent a Discord playthrough channel."""
+    #: The Discord ID of the channel.
+    id = DiscordIDField(
+        db_index=True, unique=True, primary_key=True,
+        help_text=_('The Channel\'s Discord ID.')
+    )
+    #: The user who owns the channel.
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='channels',
+        help_text=_('The owner of the Channel.')
+    )
+    #: The guild the channel is in.
+    guild = models.ForeignKey(
+        Guild, on_delete=models.CASCADE, related_name='channels',
+        help_text='The Guild the Channel is in.'
+    )
+    #: The game the channel is for.
+    game = models.ForeignKey(
+        Game, on_delete=models.CASCADE, related_name='channels',
+        help_text=_('The Game the Channel is for.')
+    )
+
+    def __str__(self) -> str:
+        """
+        Return a string representing the object.
+
+        :return: The id of the user.
+        """
+        return self.id
+
+
 __all__ = [
     'Guild', 'Series',
-    'Game', 'RoleTemplate'
+    'Game', 'RoleTemplate',
+    'User', 'Channel'
 ]
