@@ -21,6 +21,10 @@ class TestUser(PlaythroughTestBase):
         assert user.id == user_id
         assert user.pk == user_id
         assert str(user) == user_id
+        assert not user.bot_admin
+        user.bot_admin = True
+        user.save()
+        assert user.bot_admin
 
 
 class TestGuild(PlaythroughTestBase):
@@ -61,7 +65,7 @@ class TestSeries(PlaythroughTestBase):
         series_name = 'Nasuverse'
         series = self.create_series(series_name)
         assert series.name == series_name
-        assert series.pk == series_name
+        assert series.pk != series_name
         assert str(series) == series_name
 
 
@@ -95,10 +99,14 @@ class TestRoleTemplate(PlaythroughTestBase):
 class TestGame(PlaythroughTestBase):
     @staticmethod
     def create_game(
-        name: str = 'ChäoS;Child', series_name: str = 'Science Adventure'
+        name: str = 'ChäoS;Child',
+        series_name: str = 'Science Adventure',
+        channel_suffix: str = None
     ) -> Game:
         series = TestSeries.create_series(series_name)
-        return Game.objects.create(name=name, series=series)
+        return Game.objects.create(
+            name=name, series=series, channel_suffix=channel_suffix
+        )
 
     def test_create(self):
         game_name = 'Witch in the Holy Night'
@@ -107,8 +115,9 @@ class TestGame(PlaythroughTestBase):
         series = Series.objects.get(name=series_name)
         completion_role = TestRoleTemplate.create_role_template()
         assert game.name == game_name
-        assert game.pk == game_name
+        assert game.pk != game_name
         assert str(game) == game_name
+        assert game.channel_suffix == '-plays-witchintheholynight'
         assert game.series == series
         assert len(series.games.all()) > 0
         assert game.completion_role is None
@@ -117,6 +126,12 @@ class TestGame(PlaythroughTestBase):
         completion_role.refresh_from_db()
         assert completion_role.game == game
         assert game.completion_role == completion_role
+
+    def test_create_with_channel_suffix(self):
+        game_name = 'Witch in the Holy Night'
+        series_name = 'Nasuverse'
+        game = self.create_game(game_name, series_name, '-plays-wothn')
+        assert game.channel_suffix == '-plays-wothn'
 
     def test_game_relations(self):
         game = self.create_game()

@@ -1,4 +1,6 @@
 """Database models for the playthrough app."""
+import re
+
 from django.db import models
 
 from genki.models import DiscordIDField, HexColourField
@@ -11,6 +13,10 @@ class User(models.Model):
     id = DiscordIDField(
         db_index=True, unique=True, primary_key=True,
         help_text=_('The User\'s Discord ID.')
+    )
+    #: Whether or not the user is a bot admin.
+    bot_admin = models.BooleanField(
+        default=False, help_text=_('Whether or not the User is a bot admin.')
     )
 
     def __str__(self) -> str:
@@ -48,7 +54,7 @@ class Series(models.Model):
     """A model to represent a game series."""
     #: The name of the series.
     name = models.CharField(
-        max_length=255, db_index=True, unique=True, primary_key=True,
+        max_length=255, db_index=True, unique=True,
         help_text=_('The Series\' name.')
     )
 
@@ -87,7 +93,7 @@ class Game(models.Model):
     """A model to represent a game."""
     #: The name of the game.
     name = models.CharField(
-        max_length=255, db_index=True, unique=True, primary_key=True,
+        max_length=255, db_index=True, unique=True,
         help_text=_('The Game\'s name.')
     )
     #: The game's series.
@@ -105,6 +111,16 @@ class Game(models.Model):
         RoleTemplate, on_delete=models.SET_NULL, null=True, related_name='game',
         help_text=_('The role to grant upon game completion.')
     )
+    #: The suffix for channels for the game.
+    channel_suffix = models.CharField(
+        max_length=10, blank=True, help_text=_('The suffix for channels for the game.')
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.channel_suffix:
+            clean_name = re.sub(r'[\W_]+', '', self.name)
+            self.channel_suffix = f'-plays-{clean_name.lower()}'
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         """
