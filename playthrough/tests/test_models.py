@@ -1,9 +1,10 @@
 import pytest
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 
 from playthrough.models import (
     Guild, Series, RoleTemplate, Game, User, Channel, Category,
-    GameConfig, MetaRoleTemplate, Archive
+    GameConfig, MetaRoleTemplate, Archive, Alias
 )
 
 from . import PlaythroughTestBase
@@ -66,7 +67,16 @@ class TestSeries(PlaythroughTestBase):
         series = self.create_series(series_name)
         assert series.name == series_name
         assert series.pk != series_name
+        assert series.slug == 'nasuverse'
         assert str(series) == series_name
+
+    def test_aliases(self):
+        series = self.create_series()
+        series.aliases.add(Alias(alias='sciadv'), bulk=False)
+        assert len(series.aliases.all()) > 0
+        assert Series.get_by_name_or_alias('sciadv') is not None
+        with pytest.raises(Series.DoesNotExist):
+            Series.get_by_name_or_alias('tm')
 
 
 class TestRoleTemplate(PlaythroughTestBase):
@@ -117,7 +127,8 @@ class TestGame(PlaythroughTestBase):
         assert game.name == game_name
         assert game.pk != game_name
         assert str(game) == game_name
-        assert game.channel_suffix == '-plays-witchintheholynight'
+        assert game.slug == 'witch-in-the-holy-night'
+        assert game.channel_suffix == '-plays-witch-in-the-holy-night'
         assert game.series == series
         assert len(series.games.all()) > 0
         assert game.completion_role is None
@@ -126,6 +137,11 @@ class TestGame(PlaythroughTestBase):
         completion_role.refresh_from_db()
         assert completion_role.game == game
         assert game.completion_role == completion_role
+
+    def test_slug_unique_guard(self):
+        self.create_game('Chaos;Child')
+        with pytest.raises(IntegrityError):
+            self.create_game('ChaoS;ChilD')
 
     def test_create_with_channel_suffix(self):
         game_name = 'Witch in the Holy Night'
@@ -141,6 +157,14 @@ class TestGame(PlaythroughTestBase):
         game2.refresh_from_db()
         assert len(game.prequels.all()) > 0
         assert len(game2.sequels.all()) > 0
+
+    def test_aliases(self):
+        game = self.create_game()
+        game.aliases.add(Alias(alias='c;c'), bulk=False)
+        assert len(game.aliases.all()) > 0
+        assert Game.get_by_name_or_alias('c;c') is not None
+        with pytest.raises(Game.DoesNotExist):
+            Game.get_by_name_or_alias('other')
 
 
 class TestCategory(PlaythroughTestBase):
@@ -184,7 +208,9 @@ class TestChannel(PlaythroughTestBase):
         game = TestGame.create_game()
         user = TestUser.create_user()
         guild = TestGuild.create_guild()
-        return Channel.objects.get_or_create(id=_id, owner=user, game=game, guild=guild)[0]
+        return Channel.objects.get_or_create(
+            id=_id, owner=user, game=game, guild=guild
+        )[0]
 
     def test_create(self):
         channel_id = '499672300291883008'

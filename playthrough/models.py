@@ -1,10 +1,11 @@
 """Database models for the playthrough app."""
-import re
-
 from django.db import models
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 from genki.models import DiscordIDField, HexColourField
-from django.utils.translation import gettext_lazy as _
 
 
 class User(models.Model):
@@ -26,6 +27,25 @@ class User(models.Model):
         :return: The id of the user.
         """
         return self.id
+
+
+class Alias(models.Model):
+    """A model to represent an Alias for a model."""
+    #: The alias.
+    alias = models.CharField(
+        max_length=100, blank=True, unique=True, help_text=_('The Alias.')
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self) -> str:
+        """
+        Return a string representing the object.
+
+        :return: The alias.
+        """
+        return self.alias
 
 
 class Guild(models.Model):
@@ -54,9 +74,28 @@ class Series(models.Model):
     """A model to represent a game series."""
     #: The name of the series.
     name = models.CharField(
-        max_length=255, db_index=True, unique=True,
+        max_length=255, db_index=True,
         help_text=_('The Series\' name.')
     )
+    #: The slug of the series. Auto generated.
+    slug = models.SlugField(
+        unique=True, blank=True,
+        help_text=_('The Series\' slug. Auto-generated.')
+    )
+    #: The series' aliases.
+    aliases = GenericRelation(Alias, help_text=_('The Series\' aliases.'))
+
+    @classmethod
+    def get_by_name_or_alias(cls, name: str):
+        """Function ot get a Series by its name or alias.
+
+        :return: The series by its alias.
+        :raises: Series.DoesNotExist"""
+        return Series.objects.get(models.Q(name=name) | models.Q(aliases__alias=name))
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = 'series'
@@ -115,11 +154,26 @@ class Game(models.Model):
     channel_suffix = models.CharField(
         max_length=10, blank=True, help_text=_('The suffix for channels for the game.')
     )
+    #: The slug of the game. Auto generated.
+    slug = models.SlugField(
+        unique=True, blank=True,
+        help_text=_('The Game\'s slug. Auto-generated.')
+    )
+    #: The game's aliases.
+    aliases = GenericRelation(Alias, help_text=_('The Game\'s aliases.'))
+
+    @classmethod
+    def get_by_name_or_alias(cls, name: str):
+        """Function ot get a Game by its name or alias.
+
+        :return: The game by its alias.
+        :raises: Game.DoesNotExist"""
+        return Game.objects.get(models.Q(name=name) | models.Q(aliases__alias=name))
 
     def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
         if not self.channel_suffix:
-            clean_name = re.sub(r'[\W_]+', '', self.name)
-            self.channel_suffix = f'-plays-{clean_name.lower()}'
+            self.channel_suffix = f'-plays-{self.slug}'
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -264,5 +318,6 @@ __all__ = [
     'Game', 'RoleTemplate',
     'User', 'Channel',
     'Category', 'GameConfig',
-    'MetaRoleTemplate', 'Archive'
+    'MetaRoleTemplate', 'Archive',
+    'Alias'
 ]
