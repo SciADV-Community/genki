@@ -1,4 +1,7 @@
 """Database models for the playthrough app."""
+from typing import TYPE_CHECKING
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -6,6 +9,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 from genki.models import DiscordIDField, HexColourField
+
+if TYPE_CHECKING:
+    from typing import Tuple, Union
 
 
 class User(models.Model):
@@ -38,6 +44,10 @@ class Alias(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
+
+    def save(self, *args, **kwargs):
+        self.alias = self.alias.lower()
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         """
@@ -86,12 +96,14 @@ class Series(models.Model):
     aliases = GenericRelation(Alias, help_text=_('The Series\' aliases.'))
 
     @classmethod
-    def get_by_name_or_alias(cls, name: str):
+    def get_by_name_or_alias(cls, name: str) -> 'Series':
         """Function ot get a Series by its name or alias.
 
         :return: The series by its alias.
         :raises: Series.DoesNotExist"""
-        return Series.objects.get(models.Q(name=name) | models.Q(aliases__alias=name))
+        return Series.objects.get(
+            models.Q(name=name) | models.Q(aliases__alias=name.lower())
+        )
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -126,6 +138,24 @@ class RoleTemplate(models.Model):
         :return: The name of the role.
         """
         return self.name
+
+    def get_colour_as_rgb(self) -> 'Union[Tuple[int,int,int],None]':
+        """Utility to return the colour in RGB.
+
+        :return: an RGB tuple or None"""
+        if self.colour is None:
+            return None
+        return tuple(int(self.colour[i:i+2], 16) for i in (0, 2, 4))
+
+    def is_valid(self) -> bool:
+        """Validate the model.
+
+        :return: Whether or not the object is valid."""
+        try:
+            self.full_clean()
+            return True
+        except (ValidationError):
+            return False
 
 
 class Game(models.Model):
@@ -168,7 +198,9 @@ class Game(models.Model):
 
         :return: The game by its alias.
         :raises: Game.DoesNotExist"""
-        return Game.objects.get(models.Q(name=name) | models.Q(aliases__alias=name))
+        return Game.objects.select_related('completion_role').get(
+            models.Q(name=name) | models.Q(aliases__alias=name.lower())
+        )
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -185,33 +217,11 @@ class Game(models.Model):
         return self.name
 
 
-class Category(models.Model):
-    """A model to represent a Discord channel category."""
-    #: The category's Discord ID.
-    id = DiscordIDField(
-        db_index=True, unique=True, primary_key=True,
-        help_text=_('The Category\'s Discord ID.')
-    )
-    #: The guild of the category.
-    guild = models.ForeignKey(
-        Guild, related_name='categories', on_delete=models.CASCADE,
-        help_text=_('The Category\'s Guild.')
-    )
-
-    def __str__(self) -> str:
-        """
-        Return a string representing the object.
-
-        :return: The ID of the category.
-        """
-        return self.id
-
-
 class GameConfig(models.Model):
     """A model to represent a game configured for a guild."""
     #: The game being configured.
     game = models.ForeignKey(
-        Game, related_name='configred_with', on_delete=models.CASCADE,
+        Game, related_name='configured_with', on_delete=models.CASCADE,
         help_text=_('The Game to configure.')
     )
     #: The guild the configuration is for.
@@ -219,15 +229,37 @@ class GameConfig(models.Model):
         Guild, related_name='games', on_delete=models.CASCADE,
         help_text=_('The Guild to configure for.')
     )
-    #: The category to use for currently active channels.
-    category = models.ForeignKey(
-        Category, related_name='games', null=True, on_delete=models.SET_NULL,
-        help_text=_('The Category for active channels.')
-    )
     #: The ID of the Role to grant upon game completion.
     completion_role_id = DiscordIDField(
         help_text=_('The ID of the Role to grant upon game completion.')
     )
+
+    class Meta:
+        unique_together = ['game', 'guild']
+
+    def is_valid(self) -> bool:
+        """Validate the model.
+
+        :return: Whether or not the object is valid."""
+        try:
+            self.full_clean()
+            return True
+        except (ValidationError):
+            return False
+
+    @classmethod
+    def get_by_game_alias(self, game: str, guild_id: str) -> 'Union[GameConfig,None]':
+        try:
+            game = Game.get_by_name_or_alias(game)
+            try:
+                return GameConfig.objects\
+                    .select_related('game', 'guild').get(
+                        guild_id=guild_id, game=game
+                    )
+            except (GameConfig.DoesNotExist):
+                return None
+        except (Game.DoesNotExist):
+            return None
 
     def __str__(self) -> str:
         """
@@ -316,8 +348,7 @@ class Archive(models.Model):
 __all__ = [
     'Guild', 'Series',
     'Game', 'RoleTemplate',
-    'User', 'Channel',
-    'Category', 'GameConfig',
+    'User', 'Channel', 'GameConfig',
     'MetaRoleTemplate', 'Archive',
     'Alias'
 ]

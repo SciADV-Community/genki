@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 
 from playthrough.models import (
-    Guild, Series, RoleTemplate, Game, User, Channel, Category,
+    Guild, Series, RoleTemplate, Game, User, Channel,
     GameConfig, MetaRoleTemplate, Archive, Alias
 )
 
@@ -90,9 +90,18 @@ class TestRoleTemplate(PlaythroughTestBase):
         role_name = 'Chaos;Head Noah'
         role_colour = '0000FF'
         role_template = self.create_role_template(role_name, role_colour)
+        assert role_template.is_valid()
         assert role_template.name == role_name
         assert role_template.colour == role_colour
         assert str(role_template) == role_name
+
+    def test_colour_to_rgb(self):
+        role_template = self.create_role_template(colour='FFFFFF')
+        assert role_template.get_colour_as_rgb() == (255, 255, 255)
+        role_template.colour = '000000'
+        assert role_template.get_colour_as_rgb() == (0, 0, 0)
+        role_template.colour = None
+        assert role_template.get_colour_as_rgb() is None
 
     def test_invalid_colour(self):
         role_name = 'Chaos;Head Noah'
@@ -165,37 +174,24 @@ class TestGame(PlaythroughTestBase):
         assert Game.get_by_name_or_alias('c;c') is not None
         with pytest.raises(Game.DoesNotExist):
             Game.get_by_name_or_alias('other')
-
-
-class TestCategory(PlaythroughTestBase):
-    @staticmethod
-    def create_category(_id: str = '599079485639229440') -> Category:
-        guild = TestGuild.create_guild()
-        return Category.objects.create(id=_id, guild=guild)
-
-    def test_create(self):
-        category_id = '373025048740626433'
-        category = self.create_category(category_id)
-        assert category.id == category_id
-        assert category.pk == category_id
-        assert category.guild is not None
-        assert str(category) == category_id
+        with pytest.raises(IntegrityError):
+            game.aliases.add(Alias(alias='C;C'), bulk=False)
 
 
 class TestGameConfig(PlaythroughTestBase):
     @staticmethod
     def create_game_config(role_id: str = '406495229743595520') -> GameConfig:
         game = TestGame.create_game()
-        category = TestCategory.create_category()
+        guild = TestGuild.create_guild()
         return GameConfig.objects.create(
-            guild=category.guild, game=game, category=category,
+            guild=guild, game=game,
             completion_role_id=role_id
         )
 
     def test_create(self):
         role_id = '421657085000810507'
         game_config = self.create_game_config(role_id)
-        assert game_config.category is not None
+        assert game_config.is_valid()
         assert game_config.guild is not None
         assert game_config.game is not None
         assert game_config.completion_role_id == role_id
