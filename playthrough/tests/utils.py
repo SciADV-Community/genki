@@ -1,22 +1,21 @@
-from io import BytesIO
+from pathlib import Path
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files import File
 
 
-def get_xml_file() -> InMemoryUploadedFile:
+def get_html_file() -> File:
     """
-    Get a dummy ``InMemoryUploadedFile`` of a valid xml file.
+    Get a dummy ``File`` of a valid html file.
 
-    :return: A dummy ``InMemoryUploadedFile``
+    :return: A dummy archive ``File``
     """
-    file = BytesIO()
-    # TODO: Add data here
-    file.seek(0)
-    return InMemoryUploadedFile(
-        file, None, 'file.xml', 'application/xml', len(file.getvalue()), None
+    file = Path(__file__).resolve().parents[0] / "fixtures" / "dummy_archive.html"
+    return File(
+        file=open(file),
+        name=file.name
     )
 
 
 __all__ = [
-    'get_xml_file'
+    'get_html_file'
 ]

@@ -8,7 +8,7 @@ from playthrough.models import (
 )
 
 from . import PlaythroughTestBase
-from .utils import get_xml_file
+from .utils import get_html_file
 
 
 class TestUser(PlaythroughTestBase):
@@ -74,6 +74,7 @@ class TestSeries(PlaythroughTestBase):
         series = self.create_series()
         series.aliases.add(Alias(alias='sciadv'), bulk=False)
         assert len(series.aliases.all()) > 0
+        assert str(series.aliases.all()[0]) == 'sciadv'
         assert Series.get_by_name_or_alias('sciadv') is not None
         with pytest.raises(Series.DoesNotExist):
             Series.get_by_name_or_alias('tm')
@@ -239,14 +240,10 @@ class TestArchive(PlaythroughTestBase):
     @staticmethod
     def create_archive():
         channel = TestChannel.create_channel()
-        file = get_xml_file()
+        file = get_html_file()
         return Archive.objects.create(channel=channel, file=file)
 
     def test_create(self):
         archive = self.create_archive()
-        assert archive.file is not None
-        channel = Channel.objects.get(pk=archive.channel.id)
-        assert channel.archive is not None
-        user = TestUser.create_user()
-        archive.users.add(user)
-        assert len(archive.users.all()) > 0
+        assert archive.file
+        assert len(archive.users.all()) == 2

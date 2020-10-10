@@ -1,6 +1,7 @@
 from django.contrib import admin
 from playthrough.models import (
-    Channel, Guild, Archive, Alias, RoleTemplate, Game, Series
+    Channel, Guild, Archive, Alias, RoleTemplate, Game, Series,
+    User
 )
 
 
@@ -20,3 +21,4 @@ admin.site.register(Alias)
 admin.site.register(RoleTemplate)
 admin.site.register(Series)
 admin.site.register(Game)
+admin.site.register(User)

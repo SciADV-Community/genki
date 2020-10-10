@@ -1,5 +1,5 @@
 """Database models for the playthrough app."""
-from typing import TYPE_CHECKING
+from typing import Tuple, Union
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -9,9 +9,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 from genki.models import DiscordIDField, HexColourField
-
-if TYPE_CHECKING:
-    from typing import Tuple, Union
 
 
 class User(models.Model):
@@ -292,6 +289,11 @@ class Channel(models.Model):
         Game, on_delete=models.CASCADE, related_name='channels',
         help_text=_('The Game the Channel is for.')
     )
+    #: Whether or not the user has finished the game.
+    finished = models.BooleanField(
+        default=False,
+        help_text=_('Whether or not the user finished playing the game.')
+    )
 
     def __str__(self) -> str:
         """
@@ -321,7 +323,7 @@ class Archive(models.Model):
         """Utility function to get the path for an archive file.
 
         :return: The path for an archive file based on the Archive instance."""
-        return f'{instance.channel.id}/{filename}'
+        return f'{instance.channel.owner.id}/{filename}'
 
     #: The Channel the archive is for.
     channel = models.OneToOneField(
