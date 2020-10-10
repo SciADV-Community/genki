@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 

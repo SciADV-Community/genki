@@ -134,3 +134,6 @@ dmypy.json
 
 # OSX
 .DS_STORE
+
+# Genki
+/media/
