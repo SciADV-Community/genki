@@ -295,13 +295,28 @@ class Channel(models.Model):
         help_text=_('Whether or not the user finished playing the game.')
     )
 
+    def update_id(self, new_id: str) -> 'Channel':
+        """Update the ID of this object.
+
+        :param new_id: the new ID to change to.
+        :return: The newly created object with the new ID."""
+        old_id = self.id
+        self.id = new_id
+        self.save()
+        new_channel = Channel.objects.get(id=new_id)
+        for archive in self.archives.all():
+            archive.channel = new_channel
+            archive.save()
+        Channel.objects.get(id=old_id).delete()
+        return new_channel
+
     def __str__(self) -> str:
         """
         Return a string representing the object.
 
         :return: The id of the user.
         """
-        return self.id
+        return str(self.id)
 
 
 class MetaRoleTemplate(RoleTemplate):
