@@ -55,6 +55,43 @@ class Alias(models.Model):
         return self.alias
 
 
+class RoleTemplate(models.Model):
+    """A model to represent a completion 'role' for a certain game."""
+    #: The name of the role.
+    name = models.CharField(
+        max_length=100, db_index=True, help_text=_('The Role\'s name.')
+    )
+    colour = HexColourField(
+        null=True, blank=True, help_text=_('The Role\'s colour in hex.')
+    )
+
+    def __str__(self) -> str:
+        """
+        Return a string representing the object.
+
+        :return: The name of the role.
+        """
+        return self.name
+
+    def get_colour_as_rgb(self) -> 'Union[Tuple[int,int,int],None]':
+        """Utility to return the colour in RGB.
+
+        :return: an RGB tuple or None"""
+        if self.colour is None:
+            return None
+        return tuple(int(self.colour[i:i+2], 16) for i in (0, 2, 4))
+
+    def is_valid(self) -> bool:
+        """Validate the model.
+
+        :return: Whether or not the object is valid."""
+        try:
+            self.full_clean()
+            return True
+        except (ValidationError):
+            return False
+
+
 class Guild(models.Model):
     """A model to represent a Discord guild."""
     #: The Discord ID of the Guild.
@@ -116,43 +153,6 @@ class Series(models.Model):
         :return: The name of the series.
         """
         return self.name
-
-
-class RoleTemplate(models.Model):
-    """A model to represent a completion 'role' for a certain game."""
-    #: The name of the role.
-    name = models.CharField(
-        max_length=100, db_index=True, help_text=_('The Role\'s name.')
-    )
-    colour = HexColourField(
-        null=True, blank=True, help_text=_('The Role\'s colour in hex.')
-    )
-
-    def __str__(self) -> str:
-        """
-        Return a string representing the object.
-
-        :return: The name of the role.
-        """
-        return self.name
-
-    def get_colour_as_rgb(self) -> 'Union[Tuple[int,int,int],None]':
-        """Utility to return the colour in RGB.
-
-        :return: an RGB tuple or None"""
-        if self.colour is None:
-            return None
-        return tuple(int(self.colour[i:i+2], 16) for i in (0, 2, 4))
-
-    def is_valid(self) -> bool:
-        """Validate the model.
-
-        :return: Whether or not the object is valid."""
-        try:
-            self.full_clean()
-            return True
-        except (ValidationError):
-            return False
 
 
 class Game(models.Model):
@@ -267,6 +267,24 @@ class GameConfig(models.Model):
         return f'{self.guild} - {self.game}'
 
 
+class MetaRoleConfig(RoleTemplate):
+    """A model to represent meta role configurations."""
+    #: The meta role's expression.
+    expression = models.CharField(
+        max_length=255, help_text=_('The meta role\'s expression.')
+    )
+    #: The games the meta role is associated with.
+    games = models.ManyToManyField(
+        GameConfig, related_name='meta_roles',
+        help_text=_('The configured Games the MetaRole is associated with.')
+    )
+    #: The Role's ID on Discord.
+    role_id = DiscordIDField(
+        db_index=True, unique=True, null=False, blank=False,
+        help_text=_('The Meta Role\'s ID on Discord.')
+    )
+
+
 class Channel(models.Model):
     """A model to represent a Discord playthrough channel."""
     #: The Discord ID of the channel.
@@ -319,19 +337,6 @@ class Channel(models.Model):
         return str(self.id)
 
 
-class MetaRoleTemplate(RoleTemplate):
-    """A model to represent meta role templates."""
-    #: The meta role's expression.
-    expression = models.CharField(
-        max_length=255, help_text=_('The meta role\'s expression.')
-    )
-    #: The games the meta role is associated with.
-    games = models.ManyToManyField(
-        Game, related_name='meta_roles',
-        help_text=_('The Games the MetaRole is associated with.')
-    )
-
-
 class Archive(models.Model):
     """A model to represent an archive."""
     def _get_archive_path(instance, filename: str) -> str:
@@ -371,6 +376,6 @@ __all__ = [
     'Guild', 'Series',
     'Game', 'RoleTemplate',
     'User', 'Channel', 'GameConfig',
-    'MetaRoleTemplate', 'Archive',
+    'MetaRoleConfig', 'Archive',
     'Alias'
 ]

@@ -3,8 +3,8 @@ from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 
 from playthrough.models import (
-    Guild, Series, RoleTemplate, Game, User, Channel,
-    GameConfig, MetaRoleTemplate, Archive, Alias
+    Guild, MetaRoleConfig, Series, RoleTemplate, Game, User, Channel,
+    GameConfig, Archive, Alias
 )
 
 from . import PlaythroughTestBase
@@ -220,19 +220,18 @@ class TestChannel(PlaythroughTestBase):
         assert str(channel) == channel_id
 
 
-class TestMetaRoleTemplate(PlaythroughTestBase):
+class TestMetaRoleConfig(PlaythroughTestBase):
     @staticmethod
-    def create_metaroletemplate(
+    def create_metaroleconfig(
         name: str = 'Child Head', expr: str = 'test1&&test2'
-    ) -> MetaRoleTemplate:
-        return MetaRoleTemplate.objects.create(name=name, expression=expr)
+    ) -> MetaRoleConfig:
+        return MetaRoleConfig.objects.create(name=name, expression=expr, role_id='123')
 
     def test_create(self):
-        role = self.create_metaroletemplate()
-        game1 = TestGame.create_game(name='Game 1')
-        game2 = TestGame.create_game(name='Game 2')
-        role.games.add(game1, game2)
-        assert len(role.games.all()) == 2
+        role = self.create_metaroleconfig()
+        game1 = TestGameConfig.create_game_config()
+        role.games.add(game1)
+        assert len(role.games.all()) == 1
         assert role.expression is not None
 
 
