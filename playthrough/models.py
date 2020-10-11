@@ -326,8 +326,8 @@ class Archive(models.Model):
         return f'{instance.channel.owner.id}/{filename}'
 
     #: The Channel the archive is for.
-    channel = models.OneToOneField(
-        Channel, related_name='archive', on_delete=models.CASCADE,
+    channel = models.ForeignKey(
+        Channel, related_name='archives', on_delete=models.CASCADE,
         help_text=_('The Channel the archive is for.')
     )
     #: The Users that appear within the archive.
@@ -337,6 +337,11 @@ class Archive(models.Model):
     )
     #: The archive file.
     file = models.FileField(upload_to=_get_archive_path)
+    #: The time the archive was created.
+    created = models.DateTimeField(
+        auto_now_add=True,
+        help_text=_('The time the archive was created.')
+    )
 
     def __str__(self) -> str:
         """
