@@ -135,6 +135,8 @@ class Series(models.Model):
 
         :return: The series by its alias.
         :raises: Series.DoesNotExist"""
+        if name is None:
+            raise Series.DoesNotExist
         return Series.objects.get(
             models.Q(name=name) | models.Q(aliases__alias=name.lower())
         )
@@ -195,6 +197,8 @@ class Game(models.Model):
 
         :return: The game by its alias.
         :raises: Game.DoesNotExist"""
+        if name is None:
+            raise Game.DoesNotExist
         return Game.objects.select_related('completion_role').get(
             models.Q(name=name) | models.Q(aliases__alias=name.lower())
         )
@@ -282,6 +286,11 @@ class MetaRoleConfig(RoleTemplate):
     role_id = DiscordIDField(
         db_index=True, unique=True, null=False, blank=False,
         help_text=_('The Meta Role\'s ID on Discord.')
+    )
+    #: The Meta Role's Guild.
+    guild = models.ForeignKey(
+        Guild, related_name='meta_roles', on_delete=models.CASCADE,
+        help_text=_('The Guild to configure for.')
     )
 
 
