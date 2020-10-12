@@ -22,6 +22,10 @@ class User(models.Model):
     bot_admin = models.BooleanField(
         default=False, help_text=_('Whether or not the User is a bot admin.')
     )
+    #: The User's username.
+    username = models.CharField(max_length=100, null=True, help_text=_('The User\'s Discord username.'))
+    #: The User's last login time.
+    last_login = models.DateTimeField(help_text=_('The last time the user logged in.'), auto_now_add=True)
 
     def __str__(self) -> str:
         """
@@ -29,7 +33,10 @@ class User(models.Model):
 
         :return: The id of the user.
         """
-        return self.id
+        return self.username if self.username else str(self.id)
+
+    def is_authenticated() -> bool:
+        return True
 
 
 class Alias(models.Model):

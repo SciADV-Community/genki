@@ -28,6 +28,10 @@ DEBUG = os.environ.get('GENKI_DEBUG', False)
 
 ALLOWED_HOSTS = []
 
+AUTHENTICATION_BACKENDS = [
+    'terminal.auth.DiscordAuthenticationBackend'
+]
+
 
 # Application definition
 
@@ -39,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'playthrough',
+    'terminal',
+    'api',
 ]
 
 MIDDLEWARE = [
