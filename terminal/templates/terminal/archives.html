@@ -16,7 +16,10 @@
                         <ol class="divide-y divide-gray-400">
                             {% for archive in channel.archives.all %}
                                 <li class="py-1">
-                                    <a class="hover:text-blue-400 hover:underline" href="#">Archive on {{ archive.created }}</a>
+                                    <a class="hover:text-blue-400 hover:underline" href="{{ archive.file.url }}">Archive on {{ archive.created }}</a>
+                                    {% if channel.owner == request.user %}
+                                        <a class="float-right hover:text-red-400 text-gray-400 hover:underline" href="{% url 'terminal:delete_archive' archive.id %}">Delete</a>
+                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ol>

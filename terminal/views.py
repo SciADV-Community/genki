@@ -1,5 +1,6 @@
 from urllib.parse import quote_plus
 from django.db.models.query_utils import Q
+from django.http.response import Http404, HttpResponse
 
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -7,7 +8,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as user_logout
 
-from playthrough.models import Channel
+from playthrough.models import Archive, Channel
 
 
 def index(request):
@@ -41,3 +42,26 @@ def archives(request):
     return render(request, 'terminal/archives.html', context={
         'channels': _channels
     })
+
+
+@login_required(login_url='/login')
+def serve_archive(request, archive_id):
+    try:
+        archive = Archive.objects.prefetch_related('users').get(pk=archive_id)
+    except Archive.DoesNotExist:
+        raise Http404("Archive does not exist.")
+    if request.user not in Archive:
+        return HttpResponse("Unauthorized", status=403)
+    return HttpResponse()
+
+
+@login_required(login_url='/login')
+def delete_archive(request, archive_id):
+    try:
+        archive = Archive.objects.select_related('channel').get(pk=archive_id)
+    except Archive.DoesNotExist:
+        raise Http404("Archive does not exist.")
+    if request.user.id != archive.channel.owner_id:
+        return HttpResponse("Unauthorized", status=403)
+    archive.delete()
+    return redirect(reverse('terminal:archives'))
