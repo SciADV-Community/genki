@@ -56,7 +56,7 @@ ROOT_URLCONF = 'genki.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'genki' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,3 +124,9 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Discord
+
+DISCORD_CLIENT_ID = os.environ.get('DISCORD_CLIENT_ID')
+
+DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET')

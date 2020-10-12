@@ -1,0 +1,45 @@
+<!DOCTYPE html>{% load cache %}
+<html lang="en-us">
+  <head>
+    {% cache 604800 meta %}
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge, chrome=1">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="generator" content="Genki">
+    {% endcache %}
+    {% block color %}
+      <meta name="theme-color" content="#00cca8">
+      <meta name="msapplication-navbutton-color" content="#00cca8">
+      <meta name="apple-mobile-web-app-status-bar-style" content="#00cca8">
+    {% endblock %}
+    {% block keywords %}
+      <meta name="keywords" content="discord,visualnovels">
+    {% endblock %}
+    {% block robots %}
+      <meta name="robots" content="index,follow">
+    {% endblock %}
+    {% block description %}
+      <meta name="twitter:description" content="Discord Playthrough Server Archives">
+      <meta property="og:description" content="Discord Playthrough Server Archives">
+      <meta name="description" content="Discord Playthrough Server Archives">
+    {% endblock %}
+    {% block stylesheets %}
+      {% cache 604800 styles %}
+        <!-- TODO Styles -->
+      {% endcache %}
+    {% endblock %}
+    {% block head_extras %}{% endblock %}
+    {% block title %}
+      <meta name="twitter:title" content="Genki">
+      <meta property="og:title" content="Genki">
+      <meta name="title" content="Genki">
+      <title>Genki</title>
+    {% endblock %}
+  </head>
+  <body>
+    <main id="content">
+        {% block content %}
+        {% endblock %}
+    </main>
+  </body>
+</html>{% endspaceless %}
