@@ -18,8 +18,17 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+import playthrough
+
 urlpatterns = [
     path('', include('terminal.urls')),
     path('api/', include('api.urls', namespace='api')),
     path('admin/', admin.site.urls),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns.append(
+        path(r'media/protected/(?P<filename>.*)', playthrough.views.serve_archive, name='serve_archive')
+        )

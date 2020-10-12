@@ -45,17 +45,6 @@ def archives(request):
 
 
 @login_required(login_url='/login')
-def serve_archive(request, archive_id):
-    try:
-        archive = Archive.objects.prefetch_related('users').get(pk=archive_id)
-    except Archive.DoesNotExist:
-        raise Http404("Archive does not exist.")
-    if request.user not in Archive:
-        return HttpResponse("Unauthorized", status=403)
-    return HttpResponse()
-
-
-@login_required(login_url='/login')
 def delete_archive(request, archive_id):
     try:
         archive = Archive.objects.select_related('channel').get(pk=archive_id)

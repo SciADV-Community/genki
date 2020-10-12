@@ -364,7 +364,7 @@ class Archive(models.Model):
         """Utility function to get the path for an archive file.
 
         :return: The path for an archive file based on the Archive instance."""
-        return f'{instance.channel.owner.id}/{filename}'
+        return f'protected/{instance.channel.owner.id}/{filename}'
 
     #: The Channel the archive is for.
     channel = models.ForeignKey(
