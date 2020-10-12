@@ -179,6 +179,11 @@ class Game(models.Model):
         RoleTemplate, on_delete=models.SET_NULL, null=True, related_name='game',
         help_text=_('The role to grant upon game completion.')
     )
+    #: Whether or not this game is playable or just placeholder.
+    playable = models.BooleanField(
+        default=True, blank=False, null=False,
+        help_text=_('Whether or not users can create playthrough channels.')
+    )
     #: The suffix for channels for the game.
     channel_suffix = models.CharField(
         max_length=10, blank=True, help_text=_('The suffix for channels for the game.')
