@@ -1,4 +1,10 @@
 {% extends 'layout.html' %}
 {% block content %}
-<span><a href="{% url 'terminal:login' %}">Log in</a> with Discord.</span>
+    <div class="container mx-auto flex flex-col justify-center h-screen">
+        <div class="w-fill rounded-full p-3 overflow-hidden shadow-lg bg-white">
+            <p class="font-mono text-6xl text-center">
+                <a class="underline hover:text-blue-400" href="{% url 'terminal:login' %}">Log in</a> with Discord.
+            </p>
+        </div>
+    </div>
 {% endblock %}

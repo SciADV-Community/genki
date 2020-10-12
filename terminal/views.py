@@ -1,13 +1,18 @@
 from urllib.parse import quote_plus
-from django.http.response import JsonResponse
+from django.db.models.query_utils import Q
 
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout as user_logout
+
+from playthrough.models import Channel
 
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect(reverse('terminal:archives'))
     return render(request, 'terminal/index.html')
 
 
@@ -21,9 +26,18 @@ def login(request):
     ))
 
 
+def logout(request):
+    user_logout(request)
+    return redirect(reverse('terminal:index'))
+
+
 @login_required(login_url='/login')
 def archives(request):
-    return JsonResponse({
-        "id": request.user.id,
-        "name": request.user.username
+    _channels = Channel.objects.exclude(archives=None)\
+        .select_related('game', 'game__series', 'guild')\
+        .prefetch_related('archives').filter(
+            Q(archives__users__in=[request.user]) | Q(owner=request.user)
+        ).distinct()
+    return render(request, 'terminal/archives.html', context={
+        'channels': _channels
     })

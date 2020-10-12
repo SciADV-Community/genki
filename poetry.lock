@@ -99,6 +99,17 @@ argon2 = ["argon2-cffi (>=16.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-tailwind"
+version = "0.10.0"
+description = "Tailwind CSS Framework for Django projects"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+django = ">=2.2,<3.2"
+
+[[package]]
 name = "flake8"
 version = "3.8.4"
 description = "the modular source code checker: pep8 pyflakes and co"
@@ -365,7 +376,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "e76d05e44bf539debfaf874e1b08ed2c867c715ebc0cad9fd76cb0d004f8a573"
+content-hash = "77d389a7e8027dd76d30109f99ec1b1041eabaa4c2fc551bef7820b4431f1867"
 
 [metadata.files]
 asgiref = [
@@ -435,6 +446,10 @@ coverage = [
 django = [
     {file = "Django-3.1.2-py3-none-any.whl", hash = "sha256:c93c28ccf1d094cbd00d860e83128a39e45d2c571d3b54361713aaaf9a94cac4"},
     {file = "Django-3.1.2.tar.gz", hash = "sha256:a2127ad0150ec6966655bedf15dbbff9697cc86d61653db2da1afa506c0b04cc"},
+]
+django-tailwind = [
+    {file = "django-tailwind-0.10.0.tar.gz", hash = "sha256:595a476b66de4f55e3642f771439fb4b44a7fac13b7dd48a8929fdfece77908c"},
+    {file = "django_tailwind-0.10.0-py3-none-any.whl", hash = "sha256:cbe984f5bd4aad2e0270464cbce381fee437c7ed1bbe9add9e4b12ffafc22992"},
 ]
 flake8 = [
     {file = "flake8-3.8.4-py2.py3-none-any.whl", hash = "sha256:749dbbd6bfd0cf1318af27bf97a14e28e5ff548ef8e5b1566ccfb25a11e7c839"},

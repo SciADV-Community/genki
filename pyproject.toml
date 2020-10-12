@@ -9,6 +9,7 @@ license = "MIT"
 python = "^3.8"
 django = "^3.0.4"
 requests = "^2.24.0"
+django-tailwind = "^0.10.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.1"

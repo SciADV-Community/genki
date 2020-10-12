@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="rounded-full absolute top-0 right-0 bg-white mx-3 my-3 p-3 font-mono">
+        <a class="hover:text-blue-400" href="{% url 'terminal:logout' %}">Logout</a>
+    </div>
+    <div class="container mx-auto flex flex-col justify-center h-screen font-mono">
+        <h1 class="text-blue-400 text-6xl pt-5 pb-3">Archives</h1>
+        <div class="overflow-y-auto">
+            {% for channel in channels %}
+                <div class="w-fill rounded shadow-lg bg-white mb-4">
+                    <div class="px-6 pt-4">
+                        <div class="font-bold text-xl mb-2">
+                            {{ channel.game.name }}
+                            <span class="font-normal text-md text-gray-600">{{ channel.owner }}</span>
+                        </div>
+                        <ol class="divide-y divide-gray-400">
+                            {% for archive in channel.archives.all %}
+                                <li class="py-1">
+                                    <a class="hover:text-blue-400 hover:underline" href="#">Archive on {{ archive.created }}</a>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                    <div class="px-6 pt-4 pb-2">
+                        {% if channel.game.series %}
+                            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{ channel.game.series }}</span>
+                        {% endif %}
+                        {% if channel.finished %}
+                            <span class="inline-block bg-green-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Finished</span>
+                        {% endif %}
+                        {% if channel.owner == request.user %}
+                            <span class="inline-block bg-yellow-300 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Your channel</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

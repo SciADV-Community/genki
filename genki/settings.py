@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'playthrough',
     'terminal',
     'api',
+    # Styles
+    'tailwind',
+    'theme'
 ]
 
 MIDDLEWARE = [
@@ -136,3 +139,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DISCORD_CLIENT_ID = os.environ.get('DISCORD_CLIENT_ID')
 
 DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET')
+
+# Style
+
+TAILWIND_APP_NAME = 'theme'

@@ -1,4 +1,4 @@
-<!DOCTYPE html>{% load cache %}
+<!DOCTYPE html>{% load cache static %}
 <html lang="en-us">
   <head>
     {% cache 604800 meta %}
@@ -25,7 +25,7 @@
     {% endblock %}
     {% block stylesheets %}
       {% cache 604800 styles %}
-        <!-- TODO Styles -->
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css" />
       {% endcache %}
     {% endblock %}
     {% block head_extras %}{% endblock %}
@@ -37,7 +37,7 @@
     {% endblock %}
   </head>
   <body>
-    <main id="content">
+    <main id="content" class="bg-grey-100 dark:bg-gray-800">
         {% block content %}
         {% endblock %}
     </main>
