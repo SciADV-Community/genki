@@ -4,6 +4,14 @@ version = "0.1.0"
 description = "A Django-based Web Application to serve Discord chat archives and overall serve as a companion to a playthrough Discord server bot."
 authors = ["Rain <Rain#8710>"]
 license = "MIT"
+packages = [
+    { include = "api" },
+    { include = "deployment" },
+    { include = "genki" },
+    { include = "playthrough" },
+    { include = "terminal" },
+    { include = "theme" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
