@@ -6,7 +6,6 @@ authors = ["Rain <Rain#8710>"]
 license = "MIT"
 packages = [
     { include = "api" },
-    { include = "deployment" },
     { include = "genki" },
     { include = "playthrough" },
     { include = "terminal" },
