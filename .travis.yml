@@ -9,6 +9,7 @@ before_install:
 - pip install poetry
 install:
 - poetry install
+- pip install codecov
 script:
 - poetry run flake8 .
 - poetry run pytest --cov-report=xml:"$HOME/.cache/codecov/coverage.xml"
@@ -22,7 +23,7 @@ before_deploy:
 deploy:
   provider: script
   skip_cleanup: true
-  script: ssh -i /tmp/deploy_rsa $RELEASE_SERVER_USER@$RELEASE_SERVER "cd ~/playthroguh-bot/genki;
+  script: ssh -i /tmp/deploy_rsa $RELEASE_SERVER_USER@$RELEASE_SERVER "cd ~/playthrough-bot/genki;
     docker-compose down; git pull; docker-compose build; docker-compose up -d"
   on:
     branch: master
