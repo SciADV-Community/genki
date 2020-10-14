@@ -18,7 +18,7 @@ before_deploy:
 deploy:
     provider: script
     skip_cleanup: true
-    script: ssh -i /tmp/deploy_rsa $RELEASE_SERVER_USER@$RELEASE_SERVER "cd ~/rosetta; docker-compose down; git pull; docker-compose build; docker-compose up -d"
+    script: ssh -i /tmp/deploy_rsa $RELEASE_SERVER_USER@$RELEASE_SERVER "cd ~/playthroguh-bot/genki; docker-compose down; git pull; docker-compose build; docker-compose up -d"
     on:
         branch: master
         python: "3.8"
