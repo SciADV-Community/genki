@@ -25,8 +25,6 @@ SECRET_KEY = os.environ.get('GENKI_SECRET', 'insecure_key')
 
 DEBUG = os.environ.get('GENKI_DEBUG', False)
 
-DEBUG_PROPAGATE_EXCEPTIONS = True
-
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS_ENV = os.environ.get('GENKI_ALLOWED_HOSTS')
 if ALLOWED_HOSTS_ENV:

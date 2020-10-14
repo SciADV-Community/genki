@@ -223,9 +223,9 @@ class TestChannel(PlaythroughTestBase):
 class TestMetaRoleConfig(PlaythroughTestBase):
     @staticmethod
     def create_metaroleconfig(
-        name: str = 'Child Head', expr: str = 'test1&&test2'
+        name: str = 'Child Head', expr: str = 'test1&&test2', guild_id='344862360927993859'
     ) -> MetaRoleConfig:
-        return MetaRoleConfig.objects.create(name=name, expression=expr, role_id='123')
+        return MetaRoleConfig.objects.create(guild_id=guild_id, name=name, expression=expr, role_id='123')
 
     def test_create(self):
         role = self.create_metaroleconfig()

@@ -16,6 +16,10 @@ DEBUG = os.environ.get('GENKI_DEBUG', False)
 
 ALLOWED_HOSTS = []
 
+AUTHENTICATION_BACKENDS = [
+    'terminal.auth.DiscordAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Application definition
 
@@ -28,6 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'playthrough',
     'genki.tests',
+    'api',
+    'terminal',
 ]
 
 MIDDLEWARE = [

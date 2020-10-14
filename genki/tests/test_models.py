@@ -6,11 +6,11 @@ from genki.models import DiscordIDField, HexColourField
 
 
 def test_colour():
-    class DummyModel(Model):
+    class DummyModelColour(Model):
         colour = HexColourField()
 
     # Valid Cases
-    model = DummyModel(colour='0000FF')
+    model = DummyModelColour(colour='0000FF')
     model.full_clean()
 
     # Invalid Cases
@@ -23,11 +23,11 @@ def test_colour():
 
 
 def test_discord():
-    class DummyModel(Model):
+    class DummyModelDiscord(Model):
         discordID = DiscordIDField()
 
     # Valid Cases
-    model = DummyModel(discordID='93043948775305216')
+    model = DummyModelDiscord(discordID='93043948775305216')
     model.full_clean()
     model.discordID = '93043948775305216123819'
     model.full_clean()
