@@ -108,7 +108,7 @@ class Guild(models.Model):
     )
     #: The guild's bot admins.
     admins = models.ManyToManyField(
-        User, related_name='admin_for',
+        User, related_name='admin_for', blank=True,
         help_text=_('The Guild\'s bot admins.')
     )
 
@@ -193,7 +193,7 @@ class Game(models.Model):
     )
     #: The suffix for channels for the game.
     channel_suffix = models.CharField(
-        max_length=10, blank=True, help_text=_('The suffix for channels for the game.')
+        max_length=30, blank=True, help_text=_('The suffix for channels for the game.')
     )
     #: The slug of the game. Auto generated.
     slug = models.SlugField(

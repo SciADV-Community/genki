@@ -30,5 +30,5 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
     urlpatterns.append(
-        path(r'media/protected/<path:path>', views.serve_archive, name='serve_archive')
-        )
+        path('media/protected/<path:filename>', views.serve_archive, name='serve_archive')
+    )
