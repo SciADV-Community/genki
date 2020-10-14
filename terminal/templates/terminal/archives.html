@@ -6,37 +6,43 @@
     <div class="container mx-auto flex flex-col justify-center h-screen font-mono">
         <h1 class="text-blue-400 text-6xl pt-5 pb-3">Archives</h1>
         <div class="overflow-y-auto">
-            {% for channel in channels %}
-                <div class="w-fill rounded shadow-lg bg-white mb-4">
-                    <div class="px-6 pt-4">
-                        <div class="font-bold text-xl mb-2">
-                            {{ channel.game.name }}
-                            <span class="font-normal text-md text-gray-600">{{ channel.owner }}</span>
+            {% if channels %}
+                {% for channel in channels %}
+                    <div class="w-fill rounded shadow-lg bg-white mb-4">
+                        <div class="px-6 pt-4">
+                            <div class="font-bold text-xl mb-2">
+                                {{ channel.game.name }}
+                                <span class="font-normal text-md text-gray-600">{{ channel.owner }}</span>
+                            </div>
+                            <ol class="divide-y divide-gray-400">
+                                {% for archive in channel.archives.all %}
+                                    <li class="py-1">
+                                        <a class="hover:text-blue-400 hover:underline" href="{{ archive.file.url }}">Archive on {{ archive.created }}</a>
+                                        {% if channel.owner == request.user %}
+                                            <a class="float-right hover:text-red-400 text-gray-400 hover:underline" href="{% url 'terminal:delete_archive' archive.id %}">Delete</a>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ol>
                         </div>
-                        <ol class="divide-y divide-gray-400">
-                            {% for archive in channel.archives.all %}
-                                <li class="py-1">
-                                    <a class="hover:text-blue-400 hover:underline" href="{{ archive.file.url }}">Archive on {{ archive.created }}</a>
-                                    {% if channel.owner == request.user %}
-                                        <a class="float-right hover:text-red-400 text-gray-400 hover:underline" href="{% url 'terminal:delete_archive' archive.id %}">Delete</a>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ol>
+                        <div class="px-6 pt-4 pb-2">
+                            {% if channel.game.series %}
+                                <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{ channel.game.series }}</span>
+                            {% endif %}
+                            {% if channel.finished %}
+                                <span class="inline-block bg-green-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Finished</span>
+                            {% endif %}
+                            {% if channel.owner == request.user %}
+                                <span class="inline-block bg-yellow-300 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Your channel</span>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="px-6 pt-4 pb-2">
-                        {% if channel.game.series %}
-                            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{{ channel.game.series }}</span>
-                        {% endif %}
-                        {% if channel.finished %}
-                            <span class="inline-block bg-green-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Finished</span>
-                        {% endif %}
-                        {% if channel.owner == request.user %}
-                            <span class="inline-block bg-yellow-300 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Your channel</span>
-                        {% endif %}
-                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="w-fill rounded shadow-lg bg-white mb-4 p-4">
+                    <p class="text-xl text-gray-700">You don't have any channel archives to view.</p>
                 </div>
-            {% endfor %}
+            {% endif %}
         </div>
     </div>
 {% endblock %}

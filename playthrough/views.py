@@ -1,4 +1,4 @@
-from django.http.response import FileResponse, HttpResponse
+from django.http.response import HttpResponse
 from playthrough.models import Archive
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404

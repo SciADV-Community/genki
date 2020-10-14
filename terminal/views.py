@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as user_logout
 
-from playthrough.models import Archive, Channel
+from playthrough.models import Archive, Channel, User
 
 
 def index(request):
@@ -34,6 +34,10 @@ def logout(request):
 
 @login_required(login_url='/login')
 def archives(request):
+    # TODO Move this to a custom wrapper function
+    if request.user.__class__ != User:
+        user_logout(request)
+        return redirect(reverse('terminal:index'))
     _channels = Channel.objects.exclude(archives=None)\
         .select_related('game', 'game__series', 'guild')\
         .prefetch_related('archives').filter(

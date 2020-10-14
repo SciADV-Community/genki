@@ -12,7 +12,7 @@ class DiscordAuthenticationBackend(BaseBackend):
             user.save()
         except User.DoesNotExist:
             # Create a new user
-            user = User(id=str(user_info['id'], username=username))
+            user = User(id=str(user_info['id']), username=username)
             user.save()
         return user
 

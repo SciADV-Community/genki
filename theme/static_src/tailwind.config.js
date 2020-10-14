@@ -1,5 +1,8 @@
 module.exports = {
-  purge: [],
+  purge: [
+    '../../terminal/templates/**/*.html',
+    '../../genki/templates/**/*.html',
+  ],
   target: 'relaxed',
   prefix: '',
   important: false,

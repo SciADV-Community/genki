@@ -1,0 +1,30 @@
+version: '3'
+services:
+    genki:
+        build:
+            context: .
+        volumes:
+            - static_data:/vol/web/static
+            - ./media:/vol/web/media
+        env_file:
+            - .env
+        depends_on:
+            - db
+    nginx:
+        build:
+            context: ./deployment/nginx
+        volumes:
+            - static_data:/vol/static
+            - ./media:/vol/media
+        ports:
+            - "8080:8080"
+        depends_on:
+            - genki
+    db:
+        image: postgres
+        restart: always
+        env_file:
+            - .env
+
+volumes:
+    static_data:

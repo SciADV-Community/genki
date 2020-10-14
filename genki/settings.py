@@ -21,15 +21,20 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '3sgmtb5g$cgf@361^!+&4p8ym7jxe4%3go_imyv@cbbb(91kvv'
+SECRET_KEY = os.environ.get('GENKI_SECRET', 'insecure_key')
 
 DEBUG = os.environ.get('GENKI_DEBUG', False)
 
+DEBUG_PROPAGATE_EXCEPTIONS = True
+
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS_ENV = os.environ.get('GENKI_ALLOWED_HOSTS')
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(','))
 
 AUTHENTICATION_BACKENDS = [
-    'terminal.auth.DiscordAuthenticationBackend'
+    'terminal.auth.DiscordAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 
@@ -84,12 +89,25 @@ WSGI_APPLICATION = 'genki.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'genki',
+            'USER': os.environ.get('GENKI_DB_USER'),
+            'PASSWORD': os.environ.get('GENKI_DB_PASSWORD'),
+            'HOST': os.environ.get('GENKI_DB_HOST'),
+            'PORT': os.environ.get('GENKI_DB_PORT'),
+        }
+    }
 
 
 # Password validation
@@ -129,6 +147,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'
 
