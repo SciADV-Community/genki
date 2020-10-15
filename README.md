@@ -24,7 +24,7 @@ Run `poetry run python manage.py tailwind build`.
   - `DISCORD_CLIENT_SECRET`: The Discord app Secret.
   - `GENKI_DB_USER`: The database username for genki.
   - `GENKI_DB_PASSWORD`: The database password for genki.
-  - `GENKI_DB_HOST`: The hostname of the PostgreSQL instance (for pointing to localhost outside of docker, use `host.docker.internal`).
+  - `GENKI_DB_HOST`: The hostname of the PostgreSQL instance (for pointing to localhost outside of docker, use `host.docker.internal` if you're using Docker Desktop, or (probably, check with `ifconfig`) `172.17.0.1` on Linux).
   - `GENKI_DB_PORT`: The port the PostgreSQL instance is running on (5432 by default).
   - (Optional) `GENKI_HTTPS`: If serving over HTTPS.
 2. Build the images with `docker-compose build`. 

@@ -19,8 +19,16 @@ services:
             - "10080:8080"
         depends_on:
             - genki
-
 volumes:
     static:
     genki_media:
         external: true
+networks:
+    default:
+        driver: bridge
+        driver_opts: 
+            com.docker.network.bridge.name: genki
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.30.0.0/16
