@@ -1,5 +1,7 @@
 # genki
 
+[![Build Status](https://travis-ci.org/SciADV-Community/genki.svg?branch=master)](https://travis-ci.org/SciADV-Community/genki)
+
 Genki is the web service component of [rosetta](https://github.com/SciADV-Community/rosetta), a Discord bot for visual novels playthrough servers. It is built with [Django](https://www.djangoproject.com/) and [tailwindcss](https://tailwindcss.com/).
 
 ## Development setup
