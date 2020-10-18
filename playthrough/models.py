@@ -111,6 +111,11 @@ class Guild(models.Model):
         User, related_name='admin_for', blank=True,
         help_text=_('The Guild\'s bot admins.')
     )
+    #: (Optional) The guild's name.
+    name = models.CharField(
+        max_length=255, blank=True, null=True,
+        help_text=_('The guild\'s name')
+    )
 
     def __str__(self) -> str:
         """
@@ -118,7 +123,7 @@ class Guild(models.Model):
 
         :return: The id of the guild.
         """
-        return self.id
+        return self.name if self.name else self.id
 
 
 class Series(models.Model):
