@@ -216,7 +216,8 @@ class Game(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug:
+            self.slug = slugify(self.name)
         if not self.channel_suffix:
             self.channel_suffix = f'-plays-{self.slug}'
         super().save(*args, **kwargs)
