@@ -33,16 +33,16 @@ class Command(BaseCommand):
         c.execute('SELECT name, channel_suffix, role_name FROM Game')
         games_in_db = c.fetchall()
         self.stdout.write(f'- - Found {len(games_in_db)} games.')
-        for game in games_in_db:
-            self.stdout.write(f'- - Migrating {game[0]}')
-            role_template = RoleTemplate.objects.create(name=game[2])
+        for game_row in games_in_db:
+            self.stdout.write(f'- - Migrating {game_row[0]}')
+            role_template = RoleTemplate.objects.create(name=game_row[2])
             game = Game.objects.get_or_create(
-                name=game[0]
+                name=game_row[0]
             )[0]
-            game.channel_suffix = f'-plays-{game[1]}'
+            game.channel_suffix = f'-plays-{game_row[1]}'
             game.completion_role = role_template
             game.save()
-            self.stdout.write(f'- - Saved {game[0]}.')
+            self.stdout.write(f'- - Saved {game_row[0]}.')
             # Migrate Aliases
             c.execute('SELECT alias FROM Game_Alias WHERE game_name = ?', (game.name,))
             aliases = c.fetchall()
