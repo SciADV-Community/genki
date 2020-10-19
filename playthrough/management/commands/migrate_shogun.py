@@ -47,9 +47,9 @@ class Command(BaseCommand):
             c.execute('SELECT alias FROM Game_Alias WHERE game_name = ?', (game.name,))
             aliases = c.fetchall()
             self.stdout.write(f'- - - Found {len(aliases)} aliases.')
+            game.aliases.clear()
             for alias in aliases:
-                alias_obj = Alias.objects.get_or_create(alias=alias[0])[0]
-                game.aliases.add(alias_obj, bulk=False)
+                game.aliases.add(Alias(alias=alias[0]), bulk=False)
             self.stdout.write('- - - Migrated aliases.')
             # Migrate Configs
             c.execute('SELECT Guild_Id FROM Game_Guild WHERE Game_Name = ?', (game.name,))
