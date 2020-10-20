@@ -11,6 +11,11 @@ class AliasInline(GenericTabularInline):
     extra = 0
 
 
+class ChannelInline(admin.TabularInline):
+    model = Channel
+    extra = 0
+
+
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     inlines = [AliasInline]
@@ -41,8 +46,12 @@ class GuildAdmin(admin.ModelAdmin):
     inlines = [GameConfigInline, MetaRoleConfigInline]
 
 
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    inlines = [ChannelInline]
+
+
 # Register your models here.
 admin.site.register(Archive)
 admin.site.register(RoleTemplate)
 admin.site.register(Series)
-admin.site.register(User)
