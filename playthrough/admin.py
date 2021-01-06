@@ -19,6 +19,7 @@ class ChannelInline(admin.TabularInline):
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     inlines = [AliasInline]
+    search_fields = ['name', 'aliases__alias']
 
 
 class ArchiveInline(admin.TabularInline):
@@ -29,6 +30,12 @@ class ArchiveInline(admin.TabularInline):
 @admin.register(Channel)
 class ChannelAdmin(admin.ModelAdmin):
     inlines = [ArchiveInline]
+    search_fields = [
+        'id',
+        'owner__username', 'owner__id',
+        'game__name', 'game__aliases__alias',
+        'guild__id', 'guild__name',
+    ]
 
 
 class GameConfigInline(admin.TabularInline):
@@ -44,11 +51,13 @@ class MetaRoleConfigInline(admin.TabularInline):
 @admin.register(Guild)
 class GuildAdmin(admin.ModelAdmin):
     inlines = [GameConfigInline, MetaRoleConfigInline]
+    search_fields = ['id', 'name']
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     inlines = [ChannelInline]
+    search_fields = ['id', 'username']
 
 
 # Register your models here.
