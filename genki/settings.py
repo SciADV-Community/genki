@@ -165,3 +165,8 @@ DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET')
 # Style
 
 TAILWIND_APP_NAME = 'theme'
+
+# Reverse Proxy Settings
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
