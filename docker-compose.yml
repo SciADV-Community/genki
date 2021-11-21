@@ -2,14 +2,32 @@ version: '3'
 services:
     genki:
         image: genki
+        restart: unless-stopped
         build:
             context: .
         volumes:
             - static:/vol/web/static
             - genki_media:/vol/web/media
+        networks:
+          - frau
+          - internal
         env_file:
-            - .env
+          - .env
+        depends_on:
+          - db
+    db:
+        image: postgres
+        restart: unless-stopped
+        volumes:
+            - ./db:/var/lib/postgresql/data
+        ports:
+            - 10090:5432
+        env_file:
+          - .env
+        networks:
+            - frau
     nginx:
+        restart: unless-stopped
         build:
             context: ./deployment/nginx
         volumes:
@@ -19,16 +37,13 @@ services:
             - "10080:8080"
         depends_on:
             - genki
+        networks:
+            - internal
 volumes:
     static:
     genki_media:
         external: true
 networks:
-    default:
+    internal:
+    frau:
         driver: bridge
-        driver_opts: 
-            com.docker.network.bridge.name: genki
-        ipam:
-            driver: default
-            config:
-                - subnet: 172.30.0.0/16
