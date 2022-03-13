@@ -51,9 +51,11 @@ jobs:
           username: ${{secrets.RELEASE_SERVER_USER}}
           password: ${{secrets.RELEASE_SERVER_PASSWORD}}
           script: >-
-            cd /bot/playthrough-bot/rosetta && docker-compose down
+            cd /bot/playthrough-bot/rosetta &&
+            docker-compose down &&
             cd /bot/playthrough-bot/genki &&
             docker-compose down &&
             git pull &&
-            docker-compose up --build -d
-            cd /bot/playthrough-bot/rosetta && docker-compose up -d
+            docker-compose up --build -d &&
+            cd /bot/playthrough-bot/rosetta &&
+            docker-compose up -d
