@@ -21,21 +21,21 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-SECRET_KEY = os.environ.get('GENKI_SECRET', 'insecure_key')
+SECRET_KEY = os.environ.get("GENKI_SECRET", "insecure_key")
 
-DEBUG = os.environ.get('GENKI_DEBUG', False)
+DEBUG = os.environ.get("GENKI_DEBUG", False)
 
 ALLOWED_HOSTS = []
-ALLOWED_HOSTS_ENV = os.environ.get('GENKI_ALLOWED_HOSTS')
+ALLOWED_HOSTS_ENV = os.environ.get("GENKI_ALLOWED_HOSTS")
 if ALLOWED_HOSTS_ENV:
-    ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(','))
+    ALLOWED_HOSTS.extend(ALLOWED_HOSTS_ENV.split(","))
 
 AUTHENTICATION_BACKENDS = [
-    'terminal.auth.DiscordAuthenticationBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    "terminal.auth.DiscordAuthenticationBackend",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
-if os.environ.get('GENKI_HTTPS', False):
+if os.environ.get("GENKI_HTTPS", False):
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
@@ -43,49 +43,49 @@ if os.environ.get('GENKI_HTTPS', False):
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'playthrough',
-    'terminal',
-    'api',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "playthrough",
+    "terminal",
+    "api",
     # Styles
-    'tailwind',
-    'theme'
+    "tailwind",
+    "theme",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'genki.urls'
+ROOT_URLCONF = "genki.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'genki' / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "genki" / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'genki.wsgi.application'
+WSGI_APPLICATION = "genki.wsgi.application"
 
 
 # Database
@@ -94,22 +94,24 @@ WSGI_APPLICATION = 'genki.wsgi.application'
 
 if DEBUG:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
         }
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'genki',
-            'USER': os.environ.get('GENKI_DB_USER'),
-            'PASSWORD': os.environ.get('GENKI_DB_PASSWORD'),
-            'HOST': os.environ.get('GENKI_DB_HOST'),
-            'PORT': os.environ.get('GENKI_DB_PORT'),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "genki",
+            "USER": os.environ.get("GENKI_DB_USER"),
+            "PASSWORD": os.environ.get("GENKI_DB_PASSWORD"),
+            "HOST": os.environ.get("GENKI_DB_HOST"),
+            "PORT": os.environ.get("GENKI_DB_PORT"),
         }
     }
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 
 # Password validation
@@ -117,16 +119,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -134,9 +136,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -148,25 +150,34 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / "static"
 
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Discord
 
-DISCORD_CLIENT_ID = os.environ.get('DISCORD_CLIENT_ID')
+DISCORD_CLIENT_ID = os.environ.get("DISCORD_CLIENT_ID")
 
-DISCORD_CLIENT_SECRET = os.environ.get('DISCORD_CLIENT_SECRET')
+DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET")
 
 # Style
 
-TAILWIND_APP_NAME = 'theme'
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+TAILWIND_APP_NAME = "theme"
+
+if DEBUG:
+    INSTALLED_APPS.append("django_browser_reload")
+    MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
+
 
 # Reverse Proxy Settings
 
 USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

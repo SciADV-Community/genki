@@ -1,4 +1,4 @@
-<!DOCTYPE html>{% load cache static %}
+<!DOCTYPE html>{% load cache static tailwind_tags %}
 <html lang="en-us">
   <head>
     {% cache 604800 meta %}
@@ -24,9 +24,7 @@
       <meta name="description" content="Discord Playthrough Server Archives">
     {% endblock %}
     {% block stylesheets %}
-      {% cache 604800 styles %}
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css" />
-      {% endcache %}
+      {% tailwind_css %}
     {% endblock %}
     {% block head_extras %}{% endblock %}
     {% block title %}
