@@ -231,11 +231,14 @@ class Game(models.Model):
         :raises: Game.DoesNotExist"""
         if name is None:
             raise Game.DoesNotExist
-        return (
+        obj = (
             Game.objects.select_related("completion_role")
             .filter(models.Q(name=name) | models.Q(aliases__alias=name.lower()))
             .first()
         )
+        if not obj:
+            raise Game.DoesNotExist
+        return obj
 
     def save(self, *args, **kwargs):
         if not self.slug:
