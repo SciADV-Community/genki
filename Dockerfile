@@ -16,7 +16,7 @@ RUN apk add --update --no-cache --virtual .build-deps gcc libc-dev linux-headers
     && pip install poetry==${POETRY_VERSION}\
     && poetry config virtualenvs.create false\
     && poetry install --no-dev --no-root --extras deployment\
-    && apk del --no-cache .build-deps
+    && apk del --no-cache .build-deps\
     && apk add libpq
 
 # Deployment-specific stuff
