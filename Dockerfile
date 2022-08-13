@@ -22,7 +22,7 @@ RUN apk add --update --no-cache --virtual .build-deps gcc libc-dev linux-headers
 # Deployment-specific stuff
 COPY ./deployment/scripts /scripts
 RUN chmod +x /scripts/*\
-    && mkdir -p {/vol/web/media,/vol/web/static}\
+    && mkdir -p /vol/web/media /vol/web/static\
     && ln -s /vol/web/media /genki/media\
     && ln -s /vol/web/static /genki/static\
     && adduser -D user\
