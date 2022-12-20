@@ -3,7 +3,7 @@ FROM python:3.9-alpine
 ENV PATH="/scripts:${PATH}"\
     PYTHONUNBUFFERED=1\
     PYTHONDONTWRITEBYTECODE=1\
-    POETRY_VERSION=1.1.2\
+    POETRY_VERSION=1.3.1\
     POETRY_NO_INTERACTION=1
     
 WORKDIR /genki
@@ -15,7 +15,7 @@ RUN apk add --update --no-cache --virtual .build-deps gcc libc-dev linux-headers
     postgresql-dev python3-dev musl-dev\
     && pip install poetry==${POETRY_VERSION}\
     && poetry config virtualenvs.create false\
-    && poetry install --no-dev --no-root --extras deployment\
+    && poetry install --without dev --no-root --extras deployment\
     && apk del --no-cache .build-deps\
     && apk add libpq
 
