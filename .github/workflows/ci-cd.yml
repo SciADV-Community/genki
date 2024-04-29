@@ -30,13 +30,15 @@ jobs:
             - name: "Set up poetry"
               uses: abatilo/actions-poetry@v2
               with:
-                poetry-version: ${{ matrix.poetry-version }}
+                  poetry-version: ${{ matrix.poetry-version }}
             - name: "Install dependencies"
               run: poetry install
             - name: "Run tests & check coverage"
               run: poetry run pytest --cov-report=xml
             - name: "Upload coverage to codecov"
-              uses: codecov/codecov-action@v1
+              uses: codecov/codecov-action@v4
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
               if: success()
 
     cd:
@@ -48,11 +50,11 @@ jobs:
             - name: "Checkout repository"
               uses: actions/checkout@v2
             - name: "Deploy to server"
-              uses: appleboy/ssh-action@v0.1.4
+              uses: appleboy/ssh-action@v1.0.3
               with:
                   host: ${{secrets.RELEASE_SERVER_HOST}}
                   username: ${{secrets.RELEASE_SERVER_USER}}
-                  password: ${{secrets.RELEASE_SERVER_PASSWORD}}
+                  key: ${{secrets.RELEASE_SERVER_KEY}}
                   script: >-
                       cd /bot/playthrough-bot/rosetta &&
                       docker-compose down &&
